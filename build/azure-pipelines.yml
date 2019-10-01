@@ -1,0 +1,122 @@
+trigger:
+  branches:
+    include:
+    - master
+    - dev
+    - rel/*
+  paths:
+    exclude:
+    - README.md
+    - .editorconfig
+    - .gitignore
+
+pr:
+  branches:
+    include:
+    - master
+    - dev
+  paths:
+    exclude:
+    - README.md
+    - .editorconfig
+    - .gitignore
+
+name: $(Build.BuildId)
+
+variables:
+- name: BuildConfiguration
+  value: 'Release'
+- name: TargetSolution
+  value: 'DemoDevOps.sln'
+- group: DemoDevOps-Secrets
+- group: iOS-Signing
+- group: AndroidSigning
+- group: GitHub
+
+stages:
+- stage: QA
+  displayName: QA
+  jobs:
+  - job: iOS_QA
+    displayName: iOS QA Build
+    condition: not(startsWith(variables['Build.SourceBranch'], 'refs/heads/rel/'))
+    pool:
+      vmImage: macOS-latest
+      demands:
+      - MSBuild
+      - xcode
+      - Xamarin.iOS
+    steps:
+      - template: phases/ios.yml
+        parameters:
+          solution: $(TargetSolution)
+          appcenterKey: $(AppCenterKey_iOS_QA)
+          artifactName: 'iOS-QA'
+          isStoreRelease: false
+          buildConfiguration: Release
+          iOSCertificateFile: $(iOSDevelopmentCertificate)
+          iOSCertificatePassword: $(iOSDevelopmentPassword)
+          iOSProvisioningProfile: $(iOSDevelopmentProvisioningProfile)
+
+  - job: Android_QA
+    displayName: Android QA Build
+    condition: not(startsWith(variables['Build.SourceBranch'], 'refs/heads/rel/'))
+    pool:
+      vmImage: macOS-latest
+      demands:
+      - MSBuild
+      - Xamarin.Android
+      - JDK
+      - AndroidSDK
+    steps:
+      - template: phases/android.yml
+        parameters:
+          solution: $(TargetSolution)
+          appcenterKey: $(AppCenterKey_Android_QA)
+          artifactName: 'Droid-QA'
+
+- stage: production
+  displayName: Production
+  jobs:
+  - job: iOS_Release
+    displayName: iOS Release Build
+    condition: startsWith(variables['Build.SourceBranch'], 'refs/heads/rel/')
+    pool:
+      vmImage: macOS-latest
+      demands:
+      - MSBuild
+      - xcode
+      - Xamarin.iOS
+    steps:
+      - template: phases/ios.yml
+        parameters:
+          solution: $(TargetSolution)
+          appcenterKey: $(AppCenterKey_iOS_Store)
+          artifactName: 'iOS-Store'
+          isStoreRelease: true
+          buildConfiguration: Store
+          iOSCertificateFile: $(iOSDistributionCertificate)
+          iOSCertificatePassword: $(iOSDistributionPassword)
+          iOSProvisioningProfile: $(iOSDistributionProvisioningProfile)
+
+  - job: Android_Release
+    displayName: Android Release Build
+    condition: startsWith(variables['Build.SourceBranch'], 'refs/heads/rel/')
+    pool:
+      vmImage: macOS-latest
+      demands:
+      - MSBuild
+      - Xamarin.Android
+      - JDK
+      - AndroidSDK
+    steps:
+      - template: phases/android.yml
+        parameters:
+          solution: $(TargetSolution)
+          appcenterKey: $(AppCenterKey_Android_Store)
+          artifactName: 'Droid-Store'
+
+- stage: deploy
+  displayName: Deploy
+  condition: succeeded()
+  jobs:
