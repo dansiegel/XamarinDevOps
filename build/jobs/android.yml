@@ -1,0 +1,44 @@
+parameters:
+  solution: '**/*.sln'
+  appcenterKey: ''
+  artifactName: 'android'
+  environment: ''
+
+
+steps:
+- task: vs-publisher-473885.motz-mobile-buildtasks.android-manifest-version.android-manifest-version@0
+displayName: 'Bump Android Versions in AndroidManifest.xml'
+inputs:
+  sourcePath: src/DemoDevOps.Android/Properties/AndroidManifest.xml
+  versionName: '1.0.$(Build.BuildId)'
+
+- template: ../steps/set-runtime.yml
+
+- template: ../steps/nuget-restore.yml
+  parameters:
+    solution: ${{ parameters.solution }}
+
+- task: XamarinAndroid@1
+  displayName: 'Build Xamarin.Android project **/*Android*.csproj'
+  inputs:
+    projectFile: '**/*Android*.csproj'
+    outputDirectory: '$(Build.BinariesDirectory)/$(BuildConfiguration)'
+    configuration: '$(BuildConfiguration)'
+  env:
+    Secret_AppCenterSecret: ${{ parameters.appcenterKey }}
+    Secret_SampleString: $(SampleString)
+
+- task: AndroidSigning@3
+  displayName: 'Signing and aligning APK file(s) $(Build.BinariesDirectory)/$(BuildConfiguration)/*.apk'
+  inputs:
+    apkFiles: '$(Build.BinariesDirectory)/$(BuildConfiguration)/*.apk'
+    apksignerKeystoreFile: $(KeystoreFileName)
+    apksignerKeystorePassword: '$(KeystorePassword)'
+    apksignerKeystoreAlias: '$(KeystoreName)'
+    apksignerKeyPassword: '$(KeystorePassword)'
+
+- task: PublishPipelineArtifact@0
+  displayName: 'Publish Artifact: Droid-${{ parameters.environment }}'
+  inputs:
+    artifactName: Droid-${{ parameters.environment }}
+    targetPath: '$(Build.BinariesDirectory)/$(BuildConfiguration)'

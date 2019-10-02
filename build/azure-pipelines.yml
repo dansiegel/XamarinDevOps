@@ -47,7 +47,7 @@ stages:
       - xcode
       - Xamarin.iOS
     steps:
-      - template: phases/ios.yml
+      - template: jobs/ios.yml
         parameters:
           solution: $(TargetSolution)
           appcenterKey: $(AppCenterKey_iOS_QA)
@@ -69,7 +69,7 @@ stages:
       - JDK
       - AndroidSDK
     steps:
-      - template: phases/android.yml
+      - template: jobs/android.yml
         parameters:
           solution: $(TargetSolution)
           appcenterKey: $(AppCenterKey_Android_QA)
@@ -88,7 +88,7 @@ stages:
       - xcode
       - Xamarin.iOS
     steps:
-      - template: phases/ios.yml
+      - template: jobs/ios.yml
         parameters:
           solution: $(TargetSolution)
           appcenterKey: $(AppCenterKey_iOS_Store)
@@ -110,7 +110,7 @@ stages:
       - JDK
       - AndroidSDK
     steps:
-      - template: phases/android.yml
+      - template: jobs/android.yml
         parameters:
           solution: $(TargetSolution)
           appcenterKey: $(AppCenterKey_Android_Store)
