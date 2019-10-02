@@ -7,10 +7,10 @@ parameters:
 
 steps:
 - task: vs-publisher-473885.motz-mobile-buildtasks.android-manifest-version.android-manifest-version@0
-displayName: 'Bump Android Versions in AndroidManifest.xml'
-inputs:
-  sourcePath: src/DemoDevOps.Android/Properties/AndroidManifest.xml
-  versionName: '1.0.$(Build.BuildId)'
+  displayName: 'Bump Android Versions in AndroidManifest.xml'
+  inputs:
+    sourcePath: src/DemoDevOps.Android/Properties/AndroidManifest.xml
+    versionName: '1.0.$(Build.BuildId)'
 
 - template: ../steps/set-runtime.yml
 
