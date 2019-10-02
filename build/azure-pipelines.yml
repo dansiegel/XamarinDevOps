@@ -115,8 +115,3 @@ stages:
           solution: $(TargetSolution)
           appcenterKey: $(AppCenterKey_Android_Store)
           artifactName: 'Droid-Store'
-
-- stage: deploy
-  displayName: Deploy
-  condition: succeeded()
-  jobs:
