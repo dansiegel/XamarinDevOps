@@ -32,7 +32,7 @@ steps:
 - task: vs-publisher-473885.motz-mobile-buildtasks.ios-bundle-version.ios-bundle-version@0
   displayName: 'Bump iOS Versions in Info.plist'
   inputs:
-    sourcePath: src/platforms/DemoDevOps.iOS/Info.plist
+    sourcePath: src/DemoDevOps.iOS/Info.plist
     versionName: '1.0.$(Build.BuildId)'
 
 - template: ../steps/sdks.yml
