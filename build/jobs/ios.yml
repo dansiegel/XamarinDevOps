@@ -9,8 +9,6 @@ parameters:
   iOSProvisioningProfile: ''
 
 steps:
-- template: ../steps/checkout.yml
-
 - powershell: |
     if($env:IsStoreRelease -eq $true) {
       Write-Host "Setting Build Configuration to Store"
