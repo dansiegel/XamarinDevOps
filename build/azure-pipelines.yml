@@ -31,7 +31,6 @@ variables:
 - group: DemoDevOps-Secrets
 - group: iOS-Signing
 - group: AndroidSigning
-- group: GitHub
 
 stages:
 - stage: QA
