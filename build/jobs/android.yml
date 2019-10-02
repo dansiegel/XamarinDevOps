@@ -12,9 +12,9 @@ steps:
     sourcePath: src/DemoDevOps.Android/Properties/AndroidManifest.xml
     versionName: '1.0.$(Build.BuildId)'
 
-- template: ../steps/set-runtime.yml
+- template: ../steps/sdks.yml
 
-- template: ../steps/nuget-restore.yml
+- template: ../steps/nuget.yml
   parameters:
     solution: ${{ parameters.solution }}
 
