@@ -73,6 +73,7 @@ stages:
           solution: $(TargetSolution)
           appcenterKey: $(AppCenterKey_Android_QA)
           artifactName: 'Droid-QA'
+          environment: 'QA'
 
 - stage: production
   displayName: Production
@@ -114,3 +115,4 @@ stages:
           solution: $(TargetSolution)
           appcenterKey: $(AppCenterKey_Android_Store)
           artifactName: 'Droid-Store'
+          environment: 'Store'
