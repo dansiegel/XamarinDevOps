@@ -135,3 +135,34 @@ stages:
                 bundleFile: 'Droid-Store/com.avantipoint.demodevops-Signed.aab'
                 track: 'internal'
                 rolloutToUserFraction: true
+
+  - deployment: AppCenter
+    displayName: Upload Artifacts to App Center
+    environment: App Center
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: AppCenterDistribute@3
+              displayName: 'Deploy to Visual Studio App Center (QA)'
+              condition: and(succeeded(), eq(startsWith(variables['Build.SourceBranch'], 'refs/heads/rel/'), false))
+              inputs:
+                serverEndpoint: 'App Center'
+                appSlug: 'dansiegel/DemoDevOps.iOS.QA'
+                appFile: '$(Pipeline.Workspace)/iOS-QA/DemoDevOps.iOS.ipa'
+                symbolsDsymFiles: '$(Pipeline.Workspace)/iOS-QA/DemoDevOps.iOS.app.dSYM'
+                symbolsIncludeParentDirectory: false
+                releaseNotesInput: 'This is an automated release from the Dev Branch'
+                isSilent: false
+
+            - task: AppCenterDistribute@3
+              displayName: 'Deploy to Visual Studio App Center (Store)'
+              condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/rel/'))
+              inputs:
+                serverEndpoint: 'App Center'
+                appSlug: 'dansiegel/DemoDevOps.iOS.Store'
+                appFile: '$(Pipeline.Workspace)/iOS-Store/DemoDevOps.iOS.ipa'
+                symbolsDsymFiles: '$(Pipeline.Workspace)/iOS-Store/DemoDevOps.iOS.app.dSYM'
+                symbolsIncludeParentDirectory: false
+                releaseNotesInput: 'This is an official release'
+                isSilent: false
