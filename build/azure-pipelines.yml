@@ -116,3 +116,22 @@ stages:
           appcenterKey: $(AppCenterKey_Android_Store)
           artifactName: 'Droid-Store'
           environment: 'Store'
+
+- stage: deploy
+  displayName: Deploy
+  condition: startsWith(variables['Build.SourceBranch'], 'refs/heads/rel/')
+  jobs:
+  - deployment: GooglePlay
+    displayName: Google Play
+    environment: Google Play
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: GooglePlayReleaseBundle@3
+              inputs:
+                serviceConnection: 'GooglePlay'
+                applicationId: 'com.avantipoint.demodevops'
+                bundleFile: 'Droid-Store/com.avantipoint.demodevops-Signed.aab'
+                track: 'internal'
+                rolloutToUserFraction: true
