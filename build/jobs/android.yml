@@ -18,12 +18,18 @@ steps:
   parameters:
     solution: ${{ parameters.solution }}
 
+- task: DownloadSecureFile@1
+  name: androidKeyStore
+  inputs:
+    secureFile: $(KeystoreFileName)
+
 - task: XamarinAndroid@1
   displayName: 'Build Xamarin.Android project **/*Android*.csproj'
   inputs:
     projectFile: '**/*Android*.csproj'
     outputDirectory: '$(Build.BinariesDirectory)/$(BuildConfiguration)'
     configuration: '$(BuildConfiguration)'
+    msbuildArguments: '/t:SignAndroidPackage /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=$(androidKeyStore.secureFilePath) /p:AndroidSigningStorePass=$(KeystorePassword) /p:AndroidSigningKeyAlias=$(KeystoreName) /p:AndroidSigningKeyPass=$(KeystorePassword)'
   env:
     Secret_AppCenterSecret: ${{ parameters.appcenterKey }}
     Secret_SampleString: $(SampleString)
